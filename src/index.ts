@@ -1,6 +1,22 @@
 const GRIDSIZE = 800;
 const BOXWIDTH = GRIDSIZE / 10;
 const u = undefined;
+const defaultState: GameState =
+  { clues: [ [1,u,u,u,u,u,u,u,1]
+           , [u,u,u,0,u,1,1]
+           , [0,u,u,0,u,u,1,0]
+           , [u,u,u,u,1,u,u,u,0,0]
+           , [0,1,u,0]
+           , [u,u,1,u,u,u,u,0,0]
+           , [u,u,u,u,u,u,u,1]
+           , [0,u,u,1,1,u,u,u,u,1]
+           , [u,u,u,u,1,u,0,0,u,1]
+           , [u,u,1]
+           ],
+    answers: [],
+    selected: undefined,
+    mistakes: []
+  };
 
 window.addEventListener("DOMContentLoaded", e => {
   const canvas = document.getElementById("canvas") as HTMLCanvasElement;
@@ -35,6 +51,16 @@ window.addEventListener("DOMContentLoaded", e => {
     }
     console.log("Mistakes", mistakes);
   });
+
+  const clearBtn = document.getElementById("clear") as HTMLButtonElement;
+  clearBtn.addEventListener("click", e => {
+    const ok = confirm("Weet je zeker dat je alles wil wissen?");
+    if (ok) {
+      state = defaultState;
+      saveState(state);
+      render(ctx, state);
+    }
+  });
 });
 
 function loadState(): GameState {
@@ -46,21 +72,7 @@ function loadState(): GameState {
   } catch (e) {
   }
 
-  return { clues: [ [1,u,u,u,u,u,u,u,1]
-           , [u,u,u,0,u,1,1]
-           , [0,u,u,0,u,u,1,0]
-           , [u,u,u,u,1,u,u,u,0,0]
-           , [0,1,u,0]
-           , [u,u,1,u,u,u,u,0,0]
-           , [u,u,u,u,u,u,u,1]
-           , [0,u,u,1,1,u,u,u,u,1]
-           , [u,u,u,u,1,u,0,0,u,1]
-           , [u,u,1]
-           ],
-    answers: [],
-    selected: undefined,
-    mistakes: []
-  };
+  return defaultState;
 }
 
 function saveState(state: GameState): void {
