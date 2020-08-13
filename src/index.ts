@@ -7,32 +7,19 @@ window.addEventListener("DOMContentLoaded", e => {
   const ctx = canvas.getContext("2d")!;
   ctx.translate(0.5, 0.5);
 
-  let state: GameState = {
-    clues: [ [1,u,u,u,u,u,u,u,1]
-           , [u,u,u,0,u,1,1]
-           , [0,u,u,0,u,u,1,0]
-           , [u,u,u,u,1,u,u,u,0,0]
-           , [0,1,u,0]
-           , [u,u,1,u,u,u,u,0,0]
-           , [u,u,u,u,u,u,u,1]
-           , [0,u,u,1,1,u,u,u,u,1]
-           , [u,u,u,u,1,u,0,0,u,1]
-           , [u,u,1]
-           ],
-    answers: [],
-    selected: undefined,
-    mistakes: []
-  };
+  let state = loadState();
 
   render(ctx, state);
 
   canvas.addEventListener("click", e => {
     state = setSelected(state, e);
+    saveState(state);
     render(ctx, state);
   });
 
   document.addEventListener("keydown", e => {
     state = handleKeyPress(state, e);
+    saveState(state);
     render(ctx, state);
   });
 
@@ -50,6 +37,35 @@ window.addEventListener("DOMContentLoaded", e => {
   });
 });
 
+function loadState(): GameState {
+  try {
+    const storedState = localStorage.getItem("gameState");
+    if (storedState !== null) {
+      return JSON.parse(storedState);
+    }
+  } catch (e) {
+  }
+
+  return { clues: [ [1,u,u,u,u,u,u,u,1]
+           , [u,u,u,0,u,1,1]
+           , [0,u,u,0,u,u,1,0]
+           , [u,u,u,u,1,u,u,u,0,0]
+           , [0,1,u,0]
+           , [u,u,1,u,u,u,u,0,0]
+           , [u,u,u,u,u,u,u,1]
+           , [0,u,u,1,1,u,u,u,u,1]
+           , [u,u,u,u,1,u,0,0,u,1]
+           , [u,u,1]
+           ],
+    answers: [],
+    selected: undefined,
+    mistakes: []
+  };
+}
+
+function saveState(state: GameState): void {
+  localStorage.setItem("gameState", JSON.stringify(state));
+}
 
 function render(ctx: CanvasRenderingContext2D, state: GameState) {
   ctx.clearRect(0, 0, GRIDSIZE, GRIDSIZE);
