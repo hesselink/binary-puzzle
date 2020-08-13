@@ -1,0 +1,10 @@
+{
+  "name": "binary-puzzle",
+  "version": "1.0.0",
+  "main": "index.js",
+  "author": "Erik Hesselink",
+  "license": "BSD-3-Clause",
+  "devDependencies": {
+    "typescript": "^3.9.7"
+  }
+}
