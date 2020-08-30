@@ -3,13 +3,19 @@
 <head>
   <title>Binaire puzzel</title>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width">
   <link rel=stylesheet type=text/css href="style.css" />
   <script src=index.js></script>
 </head>
 <body>
   <canvas id=canvas width=801 height=801></canvas>
   <div id=controls>
-    <button id=check>Check</button>
-    <button id=clear>Wissen</button>
+    <button class=menu-button id=check>Check</button>
+    <button class=menu-button id=clear>Wissen</button>
+  </div>
+  <div id=input-popup>
+    <button class=input-button id=input-zero>0</button>
+    <button class=input-button id=input-one>1</button>
+    <button class=input-button id=input-clear>X</button>
   </div>
 </body>

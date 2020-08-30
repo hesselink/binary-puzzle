@@ -1,5 +1,6 @@
 body {
   display: flex;
+  position: relative;
 }
 
 #canvas {
@@ -7,10 +8,33 @@ body {
   height: 801px;
 }
 
-button {
+button.menu-button {
   display: block;
   height: 40px;
   width: 100px;
   font-size: 1.5em;
+  margin: 10px;
+}
+
+#input-popup {
+  position: absolute;
+  top: 0;
+  left: 0;
+  border-radius: 20px;
+  box-shadow: 5px 5px 5px #888;
+  display: none;
+  margin: 50px 20px;
+  background: #bbb;
+}
+
+#input-popup.visible {
+  display: block;
+}
+
+button.input-button {
+  display: block;
+  height: 80px;
+  width: 80px;
+  font-size: 3em;
   margin: 10px;
 }

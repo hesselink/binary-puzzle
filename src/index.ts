@@ -15,7 +15,8 @@ const defaultState: GameState =
            ],
     answers: [],
     selected: undefined,
-    mistakes: []
+    mistakes: [],
+    showInputPopup: false,
   };
 
 window.addEventListener("DOMContentLoaded", e => {
@@ -37,7 +38,14 @@ window.addEventListener("DOMContentLoaded", e => {
   render(ctx, state);
 
   canvas.addEventListener("click", e => {
-    state = setSelected(state, e);
+    state = setSelectedMouse(state, e);
+    saveState(state);
+    render(ctx, state);
+  });
+
+  canvas.addEventListener("touchstart", e => {
+    e.preventDefault();
+    state = setSelectedTouch(state, e);
     saveState(state);
     render(ctx, state);
   });
@@ -70,6 +78,26 @@ window.addEventListener("DOMContentLoaded", e => {
       render(ctx, state);
     }
   });
+
+  const zeroBtn = document.getElementById("input-zero") as HTMLButtonElement;
+  zeroBtn.addEventListener("click", e => {
+    e.stopPropagation();
+    e.preventDefault();
+    state = { ...setSelectedValue(state, 0), showInputPopup: false };
+    render(ctx, state);
+  });
+
+  const oneBtn = document.getElementById("input-one") as HTMLButtonElement;
+  oneBtn.addEventListener("click", e => {
+    state = { ...setSelectedValue(state, 1), showInputPopup: false };
+    render(ctx, state);
+  });
+
+  const inputClearBtn = document.getElementById("input-clear") as HTMLButtonElement;
+  inputClearBtn.addEventListener("click", e => {
+    state = { ...clearSelectValue(state), showInputPopup: false };
+    render(ctx, state);
+  });
 });
 
 function loadState(): GameState {
@@ -92,6 +120,7 @@ function render(ctx: CanvasRenderingContext2D, state: GameState) {
   ctx.clearRect(0, 0, GRIDSIZE, GRIDSIZE);
   drawGrid(ctx);
   drawState(ctx, state);
+  showInputPopup(state);
 }
 
 function drawState(ctx: CanvasRenderingContext2D, state: GameState): void {
@@ -127,6 +156,24 @@ function drawGrid(ctx: CanvasRenderingContext2D): void {
   }
 }
 
+function showInputPopup(state: GameState) {
+  if (!state.selected) {
+    return;
+  }
+  const inputPopup = document.getElementById("input-popup")!;
+  const inputClasses = inputPopup.classList;
+  if (state.showInputPopup) {
+    inputClasses.add("visible");
+  } else {
+    inputClasses.remove("visible");
+  }
+  const [x,y] = state.selected;
+  const newLeft = x * BOXWIDTH;
+  const newTop = y * BOXWIDTH;
+  inputPopup.style.left = newLeft + "px";
+  inputPopup.style.top = newTop + "px";
+}
+
 function line(ctx: CanvasRenderingContext2D, x1: number, y1: number, x2: number, y2: number): void {
   ctx.beginPath();
   ctx.moveTo(x1, y1);
@@ -134,9 +181,24 @@ function line(ctx: CanvasRenderingContext2D, x1: number, y1: number, x2: number,
   ctx.stroke();
 };
 
-function setSelected(state: GameState, e: MouseEvent): GameState {
-  const x = Math.floor(e.offsetX / BOXWIDTH);
-  const y = Math.floor(e.offsetY / BOXWIDTH);
+function setSelectedMouse(state: GameState, e: MouseEvent): GameState {
+  return setSelected(state, e.offsetX, e.offsetY);
+}
+
+function setSelectedTouch(state: GameState, e: TouchEvent): GameState {
+  if (state.showInputPopup) {
+    return { ...state, showInputPopup: false }
+  }
+  const rect = (e.target! as Element).getBoundingClientRect();
+  const bodyRect = document.body.getBoundingClientRect();
+  const offsetX = e.changedTouches[0].pageX - (rect.left - bodyRect.left);
+  const offsetY = e.changedTouches[0].pageY - (rect.top - bodyRect.top);
+  return { ...setSelected(state, offsetX, offsetY), showInputPopup: true };
+}
+
+function setSelected(state: GameState, offsetX: number, offsetY: number): GameState {
+  const x = Math.floor(offsetX / BOXWIDTH);
+  const y = Math.floor(offsetY / BOXWIDTH);
   if (x > 9 || y > 9) {
     return state;
   }
@@ -337,7 +399,8 @@ function newStateFromHash(hash: string): GameState {
     clues: newClues,
     answers: [],
     selected: undefined,
-    mistakes: []
+    mistakes: [],
+    showInputPopup: false,
   }
 }
 
@@ -471,6 +534,7 @@ interface GameState {
   answers: Value[][]; // y,x or rows of cells
   selected?: [number, number]; // x,y
   mistakes: Mistake[];
+  showInputPopup: boolean;
 }
 
 type Value = number | undefined;
