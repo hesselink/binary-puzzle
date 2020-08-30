@@ -25,6 +25,15 @@ window.addEventListener("DOMContentLoaded", e => {
 
   let state = loadState();
 
+  if (location.hash) {
+    state = newStateFromHash(location.hash.substring(1));
+  }
+
+  window.addEventListener("hashchange", e => {
+    state = newStateFromHash(location.hash.substring(1));
+    render(ctx, state);
+  });
+
   render(ctx, state);
 
   canvas.addEventListener("click", e => {
@@ -322,6 +331,87 @@ function filled(state: GameState) : boolean {
   return true;
 }
 
+function newStateFromHash(hash: string): GameState {
+  const newClues = decodeClues(hash);
+  return {
+    clues: newClues,
+    answers: [],
+    selected: undefined,
+    mistakes: []
+  }
+}
+
+function encodeClues(clues: Value[][]): string {
+  let row = "";
+  let str = "";
+  for (let y = 0; y < 10; y++) {
+    for (let x = 0; x < 10; x++) {
+      row += clueToTernary(clues[y]?.[x]);
+    }
+    console.log("row", row, parseInt(row, 3))
+    str += encodeRowNum(parseInt(row, 3));
+    row = "";
+  }
+  return str;
+}
+
+function clueToTernary(clue: number | undefined): string {
+  return clue === undefined ? "2" : ("" + clue);
+}
+
+function encodeRowNum(rowNum: number): string {
+  let str = ""
+  while (rowNum !== 0) {
+    const part = rowNum % 64;
+    console.log("encoding", part, "to", numToChar(part));
+    str += numToChar(part);
+    rowNum = rowNum >> 6;
+  }
+  return str;
+}
+
+function numToChar(num: number): string {
+  return "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_"[num];
+}
+
+function decodeClues(input: string): Value[][] {
+  const rows: Value[][] = [];
+  while (input !== "") {
+    const num = decodeRowNum(input.substring(0, 3));
+    rows.push(rowNumToRow(num));
+    input = input.substring(3);
+  }
+  return rows;
+}
+
+function decodeRowNum(input: string): number {
+  let val = 0;
+  let ix = 0;
+  while (input !== "") {
+    const chr = input.substring(0, 1);
+    console.log("decoding", chr);
+    const num = charToNum(chr);
+    console.log("decoded", num);
+    val += num << ix;
+    ix += 6;
+    input = input.substring(1);
+  }
+  return val;
+}
+
+function rowNumToRow(num: number): Value[] {
+  const vals: Value[] = [];
+  for (let chr of num.toString(3)) {
+    vals.push(chr === "2" ? undefined : parseInt(chr));
+  }
+  pad(vals, 10, 0);
+  return vals;
+}
+
+function charToNum(chr: string): number {
+  return "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_".indexOf(chr);
+}
+
 function groupBy<T, U>(xs: T[], eq: (v1: T, v2: T) => boolean): T[][] {
   let cur: T[] = [];
   const result = [];
@@ -366,6 +456,14 @@ function transpose<T>(xss: T[][]): T[][] {
     }
   }
   return res;
+}
+
+function pad<T>(arr: T[], len: number, x: T) {
+  const result = arr.slice();
+  for (let i = arr.length; i < len; i++) {
+    arr.unshift(x)
+  }
+  return arr;
 }
 
 interface GameState {
