@@ -82,6 +82,6 @@ export function setIndex<T>(ix: number, v: T, arr: T[]) {
     newArr[ix] = v;
     return newArr;
   } else {
-    return (arr as any).with(ix, v);
+    return arr.with(ix, v);
   }
 }

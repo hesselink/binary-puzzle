@@ -1,9 +1,15 @@
 interface GameState {
   clues: Value[][]; // y,x or rows of cells
   answers: Value[][]; // y,x or rows of cells
+}
+
+interface AppState {
+  stateVersion: number,
+  gameState: GameState;
   selected?: [number, number]; // x,y
-  mistakes: Mistake[];
   showInputPopup: boolean;
+  undoStack: Action[];
+  redoStack: Action[];
 }
 
 // can be null after deserialization...
@@ -26,4 +32,27 @@ interface TooManyConsecutiveInRow {
 interface DuplicateRow {
   type: "duplicate-row";
   rows: number[];
+}
+
+type Action = SetValue | ClearAll | GenerateNew
+
+type SetValue = {
+  type: "set-value",
+  position: [number, number],
+  oldValue: Value,
+  newValue: Value
+}
+
+type ClearAll = {
+  type: "clear-all",
+  selected?: [number, number],
+  oldState: GameState,
+  newState: GameState
+}
+
+type GenerateNew = {
+  type: "generate-new",
+  selected?: [number, number],
+  oldState: GameState,
+  newClues: Value[][]
 }
