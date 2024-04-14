@@ -85,6 +85,7 @@ window.addEventListener("DOMContentLoaded", e => {
     }
   });
 
+  /*
   const solveBtn = document.getElementById("solve") as HTMLButtonElement;
   solveBtn.addEventListener("click", e => {
     const solved = solve(state.clues);
@@ -92,6 +93,7 @@ window.addEventListener("DOMContentLoaded", e => {
     saveState(state);
     render(ctx, state);
   });
+  */
 
   const generateBtn = document.getElementById("generate") as HTMLButtonElement;
   generateBtn.addEventListener("click", e => {
