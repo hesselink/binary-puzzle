@@ -11,11 +11,11 @@ export function solve(clues: Value[][]): Value[][] {
 }
 
 function solveRows(clues: Value[][]): Value[][] {
-  return clues.map(solveRow);
+  const usedRows = clues.filter(row => row.length === 10 && row.every(v => v != undefined)) // remove incomplete rows
+  return clues.map(row => solveRow(row, usedRows));
 }
 
-function solveRow(row: Value[]): Value[] {
-  console.log("solveRow", row);
+function solveRow(row: Value[], usedRows: Value[][]): Value[] {
   let zeroes = row.filter(v => v === 0).length;
   let ones = row.filter(v => v === 1).length;
   const result: Value[] = [];
@@ -35,6 +35,12 @@ function solveRow(row: Value[]): Value[] {
         result.push(1);
       } else if (ones === 4 && !isValidRow(fill(0, setIndex(i, 1, row)))) {
         result.push(0);
+      } else if (zeroes === 4 && isDuplicate(fill(1, setIndex(i, 0, row)), usedRows)) {
+        console.log("used duplicates")
+        result.push(1);
+      } else if (ones === 4 && isDuplicate(fill(0, setIndex(i, 1, row)), usedRows)) {
+        console.log("used duplicates")
+        result.push(0);
       } else {
         result.push(undefined);
       }
@@ -42,7 +48,6 @@ function solveRow(row: Value[]): Value[] {
       result.push(row[i]);
     }
   }
-  console.log("solveRow end", result)
   return result;
 }
 
@@ -59,4 +64,8 @@ function fill(fillV: Value, row: Value[]) {
 
 function solveColumns(clues: Value[][]): Value[][] {
   return transpose(solveRows(transpose(clues)));
+}
+
+function isDuplicate(row: Value[], usedRows: Value[][]) {
+  return usedRows.some(usedRow => eqArray(row, usedRow));
 }
