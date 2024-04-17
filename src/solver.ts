@@ -42,6 +42,8 @@ function solveRow(row: Value[], usedRows: Value[][]): Value[] {
         console.log("used duplicates")
         result.push(0);
       } else {
+        // One extra strategy we could add is try to see if adding a value results in a duplicate row. See e.g. https://www.binarypuzzle.com/solving_binary_puzzles.php
+        // Another strategy: in the row "..100101..0." (from a 12x12) we need to place three more 1's. Each open stretch can have a max of one 1, otherwise we'd get a trio. So the last empty spot needs to be a one.
         result.push(undefined);
       }
     } else {
