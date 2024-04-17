@@ -1,7 +1,8 @@
 import "./types.js"
 import { solve } from "./solver.js"
 import { filledValues, checkValues } from "./check.js"
-import { setIndex, replicate } from "./arrays.js"
+import { replicate } from "./arrays.js"
+import { setValue } from "./grid.js"
 
 export function generate(): Value[][] {
   return generate_(replicate(10, []));
@@ -35,10 +36,6 @@ function unfilledPosition(grid: Value[][]): [number, number] {
     colIx = randomInt(10);
   } while (grid[rowIx]?.[colIx] != undefined)
   return [rowIx, colIx]
-}
-
-function setValue(rowIx: number, colIx: number, newVal: Value, values: Value[][]): Value[][] {
-  return setIndex(rowIx, setIndex(colIx, newVal, values[rowIx] ?? []), values);
 }
 
 function randomInt(max: number): number {

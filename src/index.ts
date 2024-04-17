@@ -3,6 +3,7 @@ import { solve } from "./solver.js"
 import { groupBy, eqArray, transpose, pad } from "./arrays.js"
 import { check, filled} from "./check.js"
 import { generate } from "./generator.js"
+import { setValue } from "./grid.js"
 
 const GRIDSIZE = 800;
 const BOXWIDTH = GRIDSIZE / 10;
@@ -386,7 +387,7 @@ function undoAction(state: AppState): AppState {
       const [x, y] = action.position;
       return { ...state,
         gameState: { ...state.gameState,
-                     answers: state.gameState.answers.with(y, state.gameState.answers[y].with(x, action.oldValue))
+                     answers: setValue(y, x, action.oldValue, state.gameState.answers)
                    },
         selected: action.position,
         undoStack: state.undoStack.slice(1),
@@ -423,7 +424,7 @@ function redoAction(state: AppState): AppState {
       const [x, y] = action.position;
       return { ...state,
         gameState: { ...state.gameState,
-                     answers: state.gameState.answers.with(y, state.gameState.answers[y].with(x, action.newValue))
+                     answers: setValue(y, x, action.newValue, state.gameState.answers)
                    },
         selected: action.position,
         undoStack: [action, ...state.undoStack],
