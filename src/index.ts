@@ -202,6 +202,7 @@ function render(ctx: CanvasRenderingContext2D, state: AppState) {
   drawGrid(ctx, state.gameState.clues.length);
   drawState(ctx, state);
   showInputPopup(state);
+  selectGridSize(state);
 }
 
 function drawState(ctx: CanvasRenderingContext2D, state: AppState): void {
@@ -260,6 +261,11 @@ function showInputPopup(state: AppState) {
   const newTop = y * BOXWIDTH;
   inputPopup.style.left = newLeft + "px";
   inputPopup.style.top = newTop + "px";
+}
+
+function selectGridSize(state: AppState) {
+  const sizeSelect = document.getElementById("grid-size") as HTMLSelectElement;
+  sizeSelect.value = state.gameState.clues.length + "";
 }
 
 function line(ctx: CanvasRenderingContext2D, x1: number, y1: number, x2: number, y2: number): void {
