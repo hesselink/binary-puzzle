@@ -286,11 +286,11 @@ function setSelected(state: AppState, offsetX: number, offsetY: number): AppStat
 }
 
 function handleKeyPress(state: AppState, e: KeyboardEvent): AppState {
-  switch(e.code) {
-    case "Digit0":
+  switch(e.key) {
+    case "0":
       return setSelectedValue(state, 0);
       break;
-    case "Digit1":
+    case "1":
       return setSelectedValue(state, 1);
       break;
     case "Backspace":
@@ -304,7 +304,7 @@ function handleKeyPress(state: AppState, e: KeyboardEvent): AppState {
       return moveSelectionUp(state);
     case "ArrowDown":
       return moveSelectionDown(state);
-    case "KeyZ":
+    case "z":
       if (e.metaKey && !e.ctrlKey && !e.altKey) {
         if (e.shiftKey) {
           return redoAction(state);
