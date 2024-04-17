@@ -10,6 +10,7 @@
   },
   "scripts": {
     "build": "yarn run tsc",
-    "watch": "yarn run live-server"
+    "watch": "yarn run live-server",
+    "deploy": "scp src/*.{js,html,css,png} vps:www/binaire-puzzel"
   }
 }
