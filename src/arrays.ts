@@ -55,14 +55,13 @@ export function replicate<T>(n: number, v: T): T[] {
 
 export function transpose<T>(xss: T[][]): T[][] {
   const res: T[][] = [];
-  for (let y = 0; y < 10; y++) {
-    for (let x = 0; x < 10; x++) {
-      if (xss[y]?.[x] !== undefined) {
-        if (res[x] === undefined) {
-          res[x] = [];
-        }
-        res[x][y] = xss[y][x];
+  const rowLen = Math.max(...xss.map(xs => (xs ?? []).length));
+  for (let y = 0; y < xss.length; y++) {
+    for (let x = 0; x < rowLen; x++) {
+      if (res[x] === undefined) {
+        res[x] = [];
       }
+      res[x][y] = xss[y]?.[x];
     }
   }
   return res;

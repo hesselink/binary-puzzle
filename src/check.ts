@@ -16,7 +16,7 @@ export function isValidRow(row: Value[]): boolean {
 function checkRows(clues: Value[][], answers: Value[][]): Mistake[] {
   let mistakes: Mistake[] = [];
   const rows = [];
-  for (let i = 0; i < 10; i++) {
+  for (let i = 0; i < clues.length; i++) {
     const row = makeRow(clues[i], answers[i] || []);
     rows.push(row);
     mistakes = mistakes.concat(checkRow(row, i));
@@ -30,8 +30,9 @@ function checkRow(row: Value[], ix: number): Mistake[] {
   let ones = 0;
   let consecutiveZeroes = 0;
   let consecutiveOnes = 0;
+  const maxCount = row.length / 2;
   const mistakes: Mistake[] = [];
-  for (var i = 0; i < 10; i++) {
+  for (var i = 0; i < row.length; i++) {
     if (row[i] === 0) {
       zeroes++;
       consecutiveZeroes++;
@@ -59,13 +60,13 @@ function checkRow(row: Value[], ix: number): Mistake[] {
       consecutiveOnes = 0;
     }
   }
-  if (zeroes > 5) {
+  if (zeroes > maxCount) {
     mistakes.push({
       type: "too-many-in-row",
       value: 0,
       row: ix
     });
-  } else if (ones > 5) {
+  } else if (ones > maxCount) {
     mistakes.push({
       type: "too-many-in-row",
       value: 1,
@@ -78,7 +79,7 @@ function checkRow(row: Value[], ix: number): Mistake[] {
 function findDuplicates(rows: Value[][]): Mistake[] {
   return groupBy(
     rows.map((row, ix) => [row, ix] as [Value[], number]) // add row index
-        .filter(t => t[0].length === 10 && t[0].every(x => x != undefined)) // remove incomplete rows
+        .filter(t => t[0].every(x => x != undefined)) // remove incomplete rows
         .sort(), // sort for grouping
     (t1, t2) => eqArray(t1[0], t2[0])
   ).filter(g => g.length > 1)
@@ -97,7 +98,7 @@ function makeRow(clues: Value[] | undefined, answers: Value[] | undefined): Valu
   clues = clues || [];
   answers = answers || [];
   const row = [];
-  for (var i = 0; i < 10; i++) {
+  for (var i = 0; i < clues.length; i++) {
     if (clues[i] != undefined) {
       row[i] = clues[i];
     } else {
@@ -112,8 +113,8 @@ export function filled(state: GameState) : boolean {
 }
 
 export function filledValues(clues: Value[][], answers: Value[][]) {
-  for (let i = 0; i < 10; i++) {
-    if (makeRow(clues[i], answers[i]).filter(x => x != undefined).length !== 10) {
+  for (let i = 0; i < clues.length; i++) {
+    if (makeRow(clues[i], answers[i]).filter(x => x != undefined).length !== clues[0].length) {
       return false;
     }
   }

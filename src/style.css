@@ -36,6 +36,15 @@ button#redo {
   background-image: url("redo.png");
 }
 
+select {
+  display: block;
+  height: 40px;
+  width: 100px;
+  font-size: 1.0em;
+  margin: 10px;
+  text-align: center;
+}
+
 #input-popup {
   position: absolute;
   top: 0;

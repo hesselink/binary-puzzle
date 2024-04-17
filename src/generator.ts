@@ -4,8 +4,8 @@ import { filledValues, checkValues } from "./check.js"
 import { replicate } from "./arrays.js"
 import { setValue } from "./grid.js"
 
-export function generate(): Value[][] {
-  return generate_(replicate(10, []));
+export function generate(size: number): Value[][] {
+  return generate_(replicate(size, replicate(size, undefined)));
 }
 
 function generate_(clues: Value[][]): Value[][] {
@@ -21,7 +21,7 @@ function generate_(clues: Value[][]): Value[][] {
     return generate_(newClues);
   } else {
     console.error("Generated invalid puzzle from {} by setting ({}, {}) to {}.", clues, rowIx, colIx, newVal);
-    return generate();
+    return generate(clues.length);
   }
 }
 
@@ -32,8 +32,8 @@ function sanityCheck(clues: Value[][]): boolean {
 function unfilledPosition(grid: Value[][]): [number, number] {
   let rowIx, colIx;
   do {
-    rowIx = randomInt(10);
-    colIx = randomInt(10);
+    rowIx = randomInt(grid.length);
+    colIx = randomInt(grid[0].length);
   } while (grid[rowIx]?.[colIx] != undefined)
   return [rowIx, colIx]
 }

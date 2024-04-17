@@ -1,6 +1,6 @@
 interface GameState {
-  clues: Value[][]; // y,x or rows of cells
-  answers: Value[][]; // y,x or rows of cells
+  clues: Value[][]; // y,x or rows of cells. Always fully filled
+  answers: Value[][]; // y,x or rows of cells. Rows or cells can be omitted
 }
 
 interface AppState {

@@ -6,19 +6,18 @@ import { generate } from "./generator.js"
 import { setValue } from "./grid.js"
 
 const GRIDSIZE = 800;
-const BOXWIDTH = GRIDSIZE / 10;
 const u = undefined;
 const defaultGameState: GameState =
-  { clues: [ [1,u,u,u,u,u,u,u,1]
-           , [u,u,u,0,u,1,1]
-           , [0,u,u,0,u,u,1,0]
+  { clues: [ [1,u,u,u,u,u,u,u,1,u]
+           , [u,u,u,0,u,1,1,u,u,u]
+           , [0,u,u,0,u,u,1,0,u,u]
            , [u,u,u,u,1,u,u,u,0,0]
-           , [0,1,u,0]
-           , [u,u,1,u,u,u,u,0,0]
-           , [u,u,u,u,u,u,u,1]
+           , [0,1,u,0,u,u,u,u,u,u]
+           , [u,u,1,u,u,u,u,0,0,u]
+           , [u,u,u,u,u,u,u,1,u,u]
            , [0,u,u,1,1,u,u,u,u,1]
            , [u,u,u,u,1,u,0,0,u,1]
-           , [u,u,1]
+           , [u,u,1,u,u,u,u,u,u,u]
            ],
     answers: [],
   };
@@ -110,7 +109,9 @@ window.addEventListener("DOMContentLoaded", e => {
 
   const generateBtn = document.getElementById("generate") as HTMLButtonElement;
   generateBtn.addEventListener("click", e => {
-    const generated = generate();
+    const sizeSelect = document.getElementById("grid-size") as HTMLSelectElement;
+    const selectedSize = +sizeSelect.options[sizeSelect.selectedIndex].value;
+    const generated = generate(selectedSize);
     state = { ...state,
               gameState: { ...state.gameState, clues: generated, answers: [] },
               undoStack: [ { type: "generate-new",
@@ -198,45 +199,52 @@ function migrate(deserialized: any): AppState {
 
 function render(ctx: CanvasRenderingContext2D, state: AppState) {
   ctx.clearRect(0, 0, GRIDSIZE, GRIDSIZE);
-  drawGrid(ctx);
+  drawGrid(ctx, state.gameState.clues.length);
   drawState(ctx, state);
   showInputPopup(state);
 }
 
 function drawState(ctx: CanvasRenderingContext2D, state: AppState): void {
+  const BOXWIDTH = GRIDSIZE / state.gameState.clues.length;
   if (state.selected != undefined) {
     let [x, y] = state.selected;
     ctx.fillStyle = "yellow";
     ctx.fillRect(x * BOXWIDTH + 1, y * BOXWIDTH + 1, BOXWIDTH - 2, BOXWIDTH - 2);
   }
 
-  for (let y = 0; y < 10; y++) {
-    for (let x = 0; x < 10; x++) {
+  const size = state.gameState.clues.length;
+  const offsetX = 0.35
+  const offsetY = 0.70
+  const fontSize = Math.floor(480 / size);
+  for (let y = 0; y < size; y++) {
+    for (let x = 0; x < size; x++) {
       const answer = state.gameState.answers[y]?.[x];
       if (answer != undefined) {
-        ctx.font = "48px Arial"
+        ctx.font = fontSize + "px Arial"
         ctx.fillStyle = "blue";
-        ctx.fillText("" + answer, BOXWIDTH * (x + 0.35), BOXWIDTH * (y + 0.7));
+        ctx.fillText("" + answer, BOXWIDTH * (x + offsetX), BOXWIDTH * (y + offsetY));
       }
 
       const clue = state.gameState.clues[y]?.[x];
       if (clue != undefined) {
-        ctx.font = "48px Arial"
+        ctx.font = fontSize + "px Arial"
         ctx.fillStyle = "black";
-        ctx.fillText("" + clue, BOXWIDTH * (x + 0.35), BOXWIDTH * (y + 0.7));
+        ctx.fillText("" + clue, BOXWIDTH * (x + offsetX), BOXWIDTH * (y + offsetY));
       }
     }
   }
 }
 
-function drawGrid(ctx: CanvasRenderingContext2D): void {
-  for (let i=0; i<=GRIDSIZE; i+=GRIDSIZE/10) {
-    line(ctx, 0, i, GRIDSIZE, i);
-    line(ctx, i, 0, i, GRIDSIZE);
+function drawGrid(ctx: CanvasRenderingContext2D, boardSize: number): void {
+  for (let i=0; i<=boardSize; i++) {
+    const px = i * GRIDSIZE/boardSize;
+    line(ctx, 0, px, GRIDSIZE, px);
+    line(ctx, px, 0, px, GRIDSIZE);
   }
 }
 
 function showInputPopup(state: AppState) {
+  const BOXWIDTH = GRIDSIZE / state.gameState.clues.length;
   if (!state.selected) {
     return;
   }
@@ -277,9 +285,10 @@ function setSelectedTouch(state: AppState, e: TouchEvent): AppState {
 }
 
 function setSelected(state: AppState, offsetX: number, offsetY: number): AppState {
+  const BOXWIDTH = GRIDSIZE / state.gameState.clues.length;
   const x = Math.floor(offsetX / BOXWIDTH);
   const y = Math.floor(offsetY / BOXWIDTH);
-  if (x > 9 || y > 9) {
+  if (x > state.gameState.clues[0].length - 1 || y > state.gameState.clues.length - 1) {
     return state;
   }
   console.debug("Setting selected to", [x,y]);
@@ -357,7 +366,7 @@ function moveSelectionLeft(state: AppState): AppState {
 }
 
 function moveSelectionRight(state: AppState): AppState {
-  if (state.selected === undefined || state.selected[0] === 9) {
+  if (state.selected === undefined || state.selected[0] === state.gameState.clues[0].length - 1) {
     return state;
   }
   return { ...state, selected: [state.selected[0] + 1, state.selected[1]] }
@@ -371,7 +380,7 @@ function moveSelectionUp(state: AppState): AppState {
 }
 
 function moveSelectionDown(state: AppState): AppState {
-  if (state.selected === undefined || state.selected[1] === 9) {
+  if (state.selected === undefined || state.selected[1] === state.gameState.clues.length - 1) {
     return state;
   }
   return { ...state, selected: [state.selected[0], state.selected[1] + 1] }

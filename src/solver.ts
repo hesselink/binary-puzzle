@@ -1,5 +1,5 @@
 import "./types.js"
-import { transpose, eqArray, eqMaybe, setIndex } from "./arrays.js"
+import { transpose, eqArray, eqMaybe, setIndex, replicate } from "./arrays.js"
 import { isValidRow } from "./check.js"
 
 export function solve(clues: Value[][]): Value[][] {
@@ -11,7 +11,7 @@ export function solve(clues: Value[][]): Value[][] {
 }
 
 function solveRows(clues: Value[][]): Value[][] {
-  const usedRows = clues.filter(row => row.length === 10 && row.every(v => v != undefined)) // remove incomplete rows
+  const usedRows = clues.filter(row => row.every(v => v != undefined)) // remove incomplete rows
   return clues.map(row => solveRow(row, usedRows));
 }
 
@@ -19,26 +19,28 @@ function solveRow(row: Value[], usedRows: Value[][]): Value[] {
   let zeroes = row.filter(v => v === 0).length;
   let ones = row.filter(v => v === 1).length;
   const result: Value[] = [];
-  for (var i = 0; i < 10; i++) {
+  const len = row.length;
+  const maxCount = len / 2;
+  for (var i = 0; i < len; i++) {
     if (row[i] == undefined) {
       if (i > 1 && row[i-1] === row[i-2] && row[i-1] != undefined) {
         result.push(invert(row[i-1]));
-      } else if (i < 8 && row[i+1] === row[i+2] && row[i+1] != undefined) {
+      } else if (i < len - 2 && row[i+1] === row[i+2] && row[i+1] != undefined) {
         result.push(invert(row[i+1]));
-      } else if (i > 0 && i < 9 && row[i-1] === row[i+1] && row[i-1] != undefined) {
+      } else if (i > 0 && i < len - 1 && row[i-1] === row[i+1] && row[i-1] != undefined) {
         result.push(invert(row[i-1]));
-      } else if (zeroes === 5) {
+      } else if (zeroes === maxCount) {
         result.push(1);
-      } else if (ones === 5) {
+      } else if (ones === maxCount) {
         result.push(0);
-      } else if (zeroes === 4 && !isValidRow(fill(1, setIndex(i, 0, row)))) {
+      } else if (zeroes === maxCount - 1 && !isValidRow(fill(1, setIndex(i, 0, row)))) {
         result.push(1);
-      } else if (ones === 4 && !isValidRow(fill(0, setIndex(i, 1, row)))) {
+      } else if (ones === maxCount - 1 && !isValidRow(fill(0, setIndex(i, 1, row)))) {
         result.push(0);
-      } else if (zeroes === 4 && isDuplicate(fill(1, setIndex(i, 0, row)), usedRows)) {
+      } else if (zeroes === maxCount - 1 && isDuplicate(fill(1, setIndex(i, 0, row)), usedRows)) {
         console.log("used duplicates")
         result.push(1);
-      } else if (ones === 4 && isDuplicate(fill(0, setIndex(i, 1, row)), usedRows)) {
+      } else if (ones === maxCount - 1 && isDuplicate(fill(0, setIndex(i, 1, row)), usedRows)) {
         console.log("used duplicates")
         result.push(0);
       } else {
