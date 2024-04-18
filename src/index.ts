@@ -27,7 +27,8 @@ const defaultState: AppState =
     selected: undefined,
     showInputPopup: false,
     undoStack: [],
-    redoStack: []
+    redoStack: [],
+    darkMode: false
   }
 
 window.addEventListener("DOMContentLoaded", e => {
@@ -43,6 +44,14 @@ window.addEventListener("DOMContentLoaded", e => {
 
   window.addEventListener("hashchange", e => {
     state = newStateFromHash(location.hash.substring(1));
+    render(ctx, state);
+  });
+
+  const darkModePreference = window.matchMedia("(prefers-color-scheme: dark)");
+  state.darkMode = darkModePreference.matches;
+
+  darkModePreference.addEventListener("change", e => {
+    state = { ...state, darkMode: e.matches };
     render(ctx, state);
   });
 
@@ -189,7 +198,8 @@ function migrate(deserialized: any): AppState {
       selected: deserialized.selected,
       showInputPopup: deserialized.showInputPopup,
       undoStack: [],
-      redoStack: []
+      redoStack: [],
+      darkMode: false
     }
   } else {
     console.error("Unknown state", deserialized);
@@ -198,18 +208,24 @@ function migrate(deserialized: any): AppState {
 }
 
 function render(ctx: CanvasRenderingContext2D, state: AppState) {
-  ctx.clearRect(0, 0, GRIDSIZE, GRIDSIZE);
+  initializeDrawing(ctx, state);
   drawGrid(ctx, state.gameState.clues.length);
   drawState(ctx, state);
   showInputPopup(state);
   selectGridSize(state);
 }
 
+function initializeDrawing(ctx: CanvasRenderingContext2D, state: AppState) {
+  ctx.strokeStyle = state.darkMode ? "white" : "black";
+  ctx.fillStyle = state.darkMode ? "white" : "black";
+  ctx.clearRect(0, 0, GRIDSIZE, GRIDSIZE);
+}
+
 function drawState(ctx: CanvasRenderingContext2D, state: AppState): void {
   const BOXWIDTH = GRIDSIZE / state.gameState.clues.length;
   if (state.selected != undefined) {
     let [x, y] = state.selected;
-    ctx.fillStyle = "yellow";
+    ctx.fillStyle = state.darkMode ? "blue" : "yellow";
     ctx.fillRect(x * BOXWIDTH + 1, y * BOXWIDTH + 1, BOXWIDTH - 2, BOXWIDTH - 2);
   }
 
@@ -222,14 +238,14 @@ function drawState(ctx: CanvasRenderingContext2D, state: AppState): void {
       const answer = state.gameState.answers[y]?.[x];
       if (answer != undefined) {
         ctx.font = fontSize + "px Arial"
-        ctx.fillStyle = "blue";
+        ctx.fillStyle = state.darkMode ? "yellow" : "blue";
         ctx.fillText("" + answer, BOXWIDTH * (x + offsetX), BOXWIDTH * (y + offsetY));
       }
 
       const clue = state.gameState.clues[y]?.[x];
       if (clue != undefined) {
         ctx.font = fontSize + "px Arial"
-        ctx.fillStyle = "black";
+        ctx.fillStyle = state.darkMode ? "white" : "black";
         ctx.fillText("" + clue, BOXWIDTH * (x + offsetX), BOXWIDTH * (y + offsetY));
       }
     }

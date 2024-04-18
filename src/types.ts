@@ -10,6 +10,7 @@ interface AppState {
   showInputPopup: boolean;
   undoStack: Action[];
   redoStack: Action[];
+  darkMode: boolean;
 }
 
 // can be null after deserialization...

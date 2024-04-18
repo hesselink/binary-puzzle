@@ -67,3 +67,37 @@ button.input-button {
   font-size: 3em;
   margin: 10px;
 }
+
+@media (prefers-color-scheme: dark) {
+  body {
+    background-color: black;
+    color: white;
+  }
+
+  button, select {
+    background-color: #161612;
+    color: white;
+  }
+
+  button:hover {
+    background-color: #2f2f28;
+  }
+
+  button, select {
+    border: 1px solid #7f7f7f;
+    border-radius: 3px;
+  }
+
+  button#undo {
+    background-image: url("undo-dark.png");
+  }
+
+  button#redo {
+    background-image: url("redo-dark.png");
+  }
+
+  #input-popup {
+    background-color: #444;
+    box-shadow: 5px 5px 5px #222;
+  }
+}
